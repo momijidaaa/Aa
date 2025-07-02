@@ -1,51 +1,50 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>オフ会受付フォーム</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: sans-serif; padding: 2em; background: #f0f0f0; }
-    input, button {
-      width: 100%; padding: 1em; margin: 0.5em 0;
-      font-size: 1.1em; border-radius: 0.5em;
-    }
-    #result { margin-top: 1em; font-weight: bold; }
-  </style>
+  <title>オフ会受付</title>
 </head>
 <body>
-  <h1>📝 オフ会参加受付</h1>
-  <input type="text" id="name" placeholder="あなたの名前">
+  <h1>🎉 オフ会受付フォーム</h1>
+  <input type="text" id="name" placeholder="名前を入力" />
   <button onclick="submitForm()">参加する</button>
-  <div id="result"></div>
+  <p id="status"></p>
 
   <script>
     async function getIP() {
-      try {
-        const res = await fetch("https://api.ipify.org?format=json");
-        const data = await res.json();
-        return data.ip;
-      } catch {
-        return "不明";
-      }
+      const res = await fetch("https://api.ipify.org?format=json");
+      const json = await res.json();
+      return json.ip;
     }
 
     async function submitForm() {
-      const name = document.getElementById("name").value.trim();
-      const result = document.getElementById("result");
+      const name = document.getElementById("name").value;
+      const ip = await getIP();
+      const status = document.getElementById("status");
+
       if (!name) {
-        result.innerText = "⚠️ 名前を入力してください";
+        status.textContent = "名前を入力してください";
         return;
       }
-      const ip = await getIP();
-      fetch("https://script.google.com/macros/s/YOUR_GAS_URL_HERE/exec", {
+
+      fetch("https://script.google.com/macros/s/AKfycbxMkip0iAB3ZysIxhQ4BaV6oPfG_VpZJNY7chZP9nV6A166tciMlSbrnzr2EXZLyByc/exec", {
         method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, ip })
+        body: JSON.stringify({ name, ip }),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.text())
+      .then(text => {
+        if (text.includes("重複")) {
+          status.textContent = "すでに登録されています。";
+        } else {
+          status.textContent = "参加を受け付けました！";
+        }
+      })
+      .catch(() => {
+        status.textContent = "送信に失敗しました。";
       });
-      result.innerText = "✅ 登録しました！";
-      document.getElementById("name").value = "";
     }
   </script>
 </body>
