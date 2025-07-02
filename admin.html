@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>参加者一覧（管理者）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #fff; }
+    input, button { padding: 0.8em; margin: 0.5em 0; font-size: 1em; border-radius: 0.5em; width: 100%; }
+    ul { padding: 0; list-style: none; }
+    li { background: #f1f1f1; margin: 0.5em 0; padding: 1em; border-radius: 0.5em; }
+    .ip { font-size: 0.8em; color: #555; }
+  </style>
+</head>
+<body>
+  <h1>🔐 管理者ログイン</h1>
+  <input type="password" id="password" placeholder="パスワードを入力">
+  <button onclick="login()">ログイン</button>
+  <div id="adminPanel" style="display:none;">
+    <h2>📋 参加者一覧</h2>
+    <ul id="list"></ul>
+  </div>
+
+  <script>
+    const correctPassword = "momiji10";
+    async function login() {
+      const pass = document.getElementById("password").value;
+      if (pass === correctPassword) {
+        document.getElementById("adminPanel").style.display = "block";
+        load();
+      } else {
+        alert("パスワードが違います");
+      }
+    }
+
+    async function load() {
+      const res = await fetch("https://opensheet.elk.sh/AKfycbxDUMMY_REAL_DEPLOYED_URL/Sheet1");
+      const data = await res.json();
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+      data.forEach(row => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>{row.name}</strong><div class="ip">IP: {row.ip}<br>日時: {row.時間}</div>`;
+        list.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>オフ会受付フォーム</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #f9f9f9; }
+    input, button { width: 100%; padding: 1em; margin: 0.5em 0; font-size: 1em; border: 1px solid #ccc; border-radius: 0.5em; }
+    #result { margin-top: 1em; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>📝 オフ会参加受付</h1>
+  <input type="text" id="name" placeholder="あなたの名前を入力">
+  <button onclick="submitForm()">参加する</button>
+  <div id="result"></div>
+
+  <script>
+    async function getIP() {
+      try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        const data = await res.json();
+        return data.ip;
+      } catch {
+        return "不明";
+      }
+    }
+
+    async function submitForm() {
+      const name = document.getElementById("name").value.trim();
+      const result = document.getElementById("result");
+      if (!name) {
+        result.innerText = "名前を入力してください";
+        return;
+      }
+      const ip = await getIP();
+      const data = { name, ip };
+      fetch("https://script.google.com/macros/s/AKfycbxDUMMY_REAL_DEPLOYED_URL/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      result.innerText = "✅ 登録しました！";
+      document.getElementById("name").value = "";
+    }
+  </script>
+</body>
+</html>
